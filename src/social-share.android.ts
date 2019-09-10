@@ -23,7 +23,7 @@ function useAndroidX () {
   return global.androidx && global.androidx.appcompat;
 }
 
-export function shareImage(image, subject) {
+export function shareImage(image, subject, text) {
   numberOfImagesCreated ++;
 
   context = application.android.context;
@@ -48,6 +48,9 @@ export function shareImage(image, subject) {
     shareableFileUri = FileProviderPackageName.FileProvider.getUriForFile(context, application.android.nativeApp.getPackageName() + ".provider", newFile);
   } else {
     shareableFileUri = android.net.Uri.fromFile(newFile);
+  }
+  if (text) {
+      intent.putExtra(android.content.Intent.EXTRA_TEXT, text);
   }
   intent.putExtra(android.content.Intent.EXTRA_STREAM, shareableFileUri);
 

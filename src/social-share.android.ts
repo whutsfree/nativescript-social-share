@@ -11,19 +11,31 @@ function getIntent(type) {
   intent.setType(type);
   return intent;
 }
-function share(intent, subject) {
+function share(intent, subject, callback = null) {
   context = application.android.context;
   subject = subject || "How would you like to share this?";
 
   const shareIntent = android.content.Intent.createChooser(intent, subject);
   shareIntent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+  // use application suspend/resume callbacks to determine when the share popup is completed
+  if (callback) {
+      const suspendCallback = () => {
+          application.off(application.suspendEvent, suspendCallback);
+          application.on(application.resumeEvent, resumeCallback);
+      };
+      const resumeCallback = () => {
+          application.off(application.resumeEvent, resumeCallback);
+          callback();
+      };
+      application.on(application.suspendEvent, suspendCallback);
+  }
   context.startActivity(shareIntent);
 }
 function useAndroidX () {
   return global.androidx && global.androidx.appcompat;
 }
 
-export function shareImage(image, subject, text) {
+export function shareImage(image, subject, text, callback = null) {
   numberOfImagesCreated ++;
 
   context = application.android.context;
@@ -54,21 +66,21 @@ export function shareImage(image, subject, text) {
   }
   intent.putExtra(android.content.Intent.EXTRA_STREAM, shareableFileUri);
 
-  share(intent, subject);
+  share(intent, subject, callback);
 }
 
-export function shareText(text, subject) {
+export function shareText(text, subject, callback = null) {
   const intent = getIntent("text/plain");
 
   intent.putExtra(android.content.Intent.EXTRA_TEXT, text);
-  share(intent, subject);
+  share(intent, subject, callback);
 }
 
-export function shareUrl(url, text, subject) {
+export function shareUrl(url, text, subject, callback = null) {
   const intent = getIntent("text/plain");
 
   intent.putExtra(android.content.Intent.EXTRA_TEXT, url);
   intent.putExtra(android.content.Intent.EXTRA_SUBJECT, text);
 
-  share(intent, subject);
+  share(intent, subject, callback);
 }

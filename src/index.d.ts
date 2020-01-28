@@ -6,14 +6,14 @@ import { ImageSource } from "tns-core-modules/image-source";
  * @param {string} [subject] - The subject of the share *** ANDROID ONLY ***
  * @param {string} [text] - Optional additional text to share with the image
  */
-export function shareImage(image?: ImageSource, subject?: string, text?: string);
+export function shareImage(image?: ImageSource, subject?: string, text?: string, callback?: () => void);
 
 /**
  * Share text.
  * @param {string} text - Text to share.
  * @param {string} [subject] - The subject of the share *** ANDROID ONLY ***
  */
-export function shareText(text: string, subject?: string);
+export function shareText(text: string, subject?: string, callback?: () => void);
 
 /**
  * Share URL.
@@ -21,4 +21,4 @@ export function shareText(text: string, subject?: string);
  * @param {string} text - Text to share with URL.
  * @param {string} [subject] - The subject of the share *** ANDROID ONLY ***
  */
-export function shareUrl(url: string, text: string, subject?: string);
+export function shareUrl(url: string, text: string, subject?: string, callback?: () => void);

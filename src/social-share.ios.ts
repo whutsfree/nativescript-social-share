@@ -1,6 +1,6 @@
 import { topmost } from "tns-core-modules/ui/frame";
 
-function share(thingsToShare) {
+function share(thingsToShare, callback = null) {
   const activityController = UIActivityViewController.alloc()
       .initWithActivityItemsApplicationActivities(thingsToShare, null);
 
@@ -15,18 +15,23 @@ function share(thingsToShare) {
     }
   }
 
+  if (callback) {
+      activityController.completionWithItemsHandler = () => {
+          callback();
+      };
+  }
   topmost().ios.controller
     .presentViewControllerAnimatedCompletion(activityController, true, null);
 }
 
-export function shareImage(image, subject, text) {
-  share([image, text]);
+export function shareImage(image, subject, text, callback = null) {
+  share([image, text], callback);
 }
 
-export function shareText(text) {
-  share([text]);
+export function shareText(text, callback = null) {
+  share([text], callback);
 }
 
-export function shareUrl(url, text) {
-  share([NSURL.URLWithString(url), text]);
+export function shareUrl(url, text, callback = null) {
+  share([NSURL.URLWithString(url), text], callback);
 }

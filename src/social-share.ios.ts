@@ -1,4 +1,4 @@
-import { topmost } from "tns-core-modules/ui/frame";
+import { Frame } from "@nativescript/core/ui/frame";
 
 function share(thingsToShare, callback = null) {
   const activityController = UIActivityViewController.alloc()
@@ -6,7 +6,7 @@ function share(thingsToShare, callback = null) {
 
   const presentViewController = activityController.popoverPresentationController;
   if (presentViewController) {
-    const page = topmost().currentPage;
+    const page = Frame.topmost().currentPage;
     if (page && page.ios.navigationItem.rightBarButtonItems &&
       page.ios.navigationItem.rightBarButtonItems.count > 0) {
       presentViewController.barButtonItem = page.ios.navigationItem.rightBarButtonItems[0];
@@ -20,7 +20,7 @@ function share(thingsToShare, callback = null) {
           callback();
       };
   }
-  topmost().ios.controller
+  Frame.topmost().ios.controller
     .presentViewControllerAnimatedCompletion(activityController, true, null);
 }
 

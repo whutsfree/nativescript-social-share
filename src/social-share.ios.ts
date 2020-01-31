@@ -18,8 +18,16 @@ const SHARE_VIEW = {
 };
 
 function share(thingsToShare, callback = null) {
-  const activityController = UIActivityViewController.alloc()
-      .initWithActivityItemsApplicationActivities(thingsToShare, null);
+  const activityController = UIActivityViewController.extend({
+      didDisappear: false,
+      viewDidAppear: function(animated: boolean): void {
+          this.didDisappear = false;
+      },
+      viewDidDisappear: function(animated: boolean): void {
+          this.didDisappear = true;
+      }
+  }).alloc()
+        .initWithActivityItemsApplicationActivities(thingsToShare, null);
 
   const presentViewController = activityController.popoverPresentationController;
   if (presentViewController) {
@@ -47,7 +55,9 @@ function share(thingsToShare, callback = null) {
 
   if (callback) {
       activityController.completionWithItemsHandler = () => {
-          callback();
+          if (activityController.didDisappear) {
+              callback();
+          }
       };
   }
   Frame.topmost().ios.controller

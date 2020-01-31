@@ -13,9 +13,9 @@ declare class CGRect {
     size: CGSize;
 }
 
-const SHARE_RECT = new CGRect();
-SHARE_RECT.origin = new CGPoint();
-SHARE_RECT.size = new CGSize();
+const SHARE_VIEW = {
+    view: null
+};
 
 function share(thingsToShare, callback = null) {
   const activityController = UIActivityViewController.alloc()
@@ -28,14 +28,22 @@ function share(thingsToShare, callback = null) {
       page.ios.navigationItem.rightBarButtonItems.count > 0) {
       presentViewController.barButtonItem = page.ios.navigationItem.rightBarButtonItems[0];
     } else {
-      presentViewController.sourceView = page.ios.view;
-      if (SHARE_RECT.size.width === 0 || SHARE_RECT.size.height === 0) {
-          SHARE_RECT.size.width = page.ios.view.bounds.size.width;
-          SHARE_RECT.size.height = page.ios.view.bounds.size.height;
+      if (SHARE_VIEW.view) {
+          presentViewController.sourceView = SHARE_VIEW.view;
+      } else {
+          const rect = new CGRect();
+          rect.origin = new CGPoint();
+          rect.size = new CGSize();
+          rect.origin.x = page.ios.view.bounds.origin.x;
+          rect.origin.y = page.ios.view.bounds.origin.y;
+          rect.size.width = page.ios.view.bounds.size.width;
+          rect.size.height = page.ios.view.bounds.size.height;
+          presentViewController.sourceView = page.ios.view;
+          presentViewController.sourceRect = rect;
       }
-      presentViewController.sourceRect = SHARE_RECT;
     }
   }
+  SHARE_VIEW.view = null;
 
   if (callback) {
       activityController.completionWithItemsHandler = () => {
@@ -58,9 +66,6 @@ export function shareUrl(url, text, callback = null) {
   share([NSURL.URLWithString(url), text], callback);
 }
 
-export function setShareRect(x: number, y: number, width: number, height: number) {
-    SHARE_RECT.origin.x = x;
-    SHARE_RECT.origin.y = y;
-    SHARE_RECT.size.width = width;
-    SHARE_RECT.size.height = height;
+export function setShareView(nativeView: any) {
+    SHARE_VIEW.view = nativeView;
 }

@@ -26,9 +26,6 @@ export function shareUrl(url: string, text: string, subject?: string, callback?:
 /**
  * For iPads, set the origin of the share so the popup dialog can be positioned properly. Invoke this before
  * invoking the other share calls.
- * @param x
- * @param y
- * @param width
- * @param height
+ * @param nativeView
  */
-export function setShareRect(x: number, y: number, width: number, height: number);
+export function setShareView(nativeView: any);

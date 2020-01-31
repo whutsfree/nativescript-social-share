@@ -84,3 +84,7 @@ export function shareUrl(url, text, subject, callback = null) {
 
   share(intent, subject, callback);
 }
+
+export function setShareRect(x: number, y: number, width: number, height: number) {
+    // do nothing
+}

@@ -36,35 +36,13 @@ function useAndroidX () {
 }
 
 export function shareImage(image, subject, text, callback = null) {
-  numberOfImagesCreated ++;
-
   context = application.android.context;
 
   const intent = getIntent("image/jpeg");
-
-  const stream = new java.io.ByteArrayOutputStream();
-  image.android.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, stream);
-
-  const imageFileName = "socialsharing" + numberOfImagesCreated + ".jpg";
-  const newFile = new java.io.File(context.getExternalFilesDir(null), imageFileName);
-
-  const fos = new java.io.FileOutputStream(newFile);
-  fos.write(stream.toByteArray());
-
-  fos.flush();
-  fos.close();
-
-  let shareableFileUri;
-  const sdkVersionInt = parseInt(platform.device.sdkVersion);
-  if (sdkVersionInt >= 21) {
-    shareableFileUri = FileProviderPackageName.FileProvider.getUriForFile(context, application.android.nativeApp.getPackageName() + ".provider", newFile);
-  } else {
-    shareableFileUri = android.net.Uri.fromFile(newFile);
-  }
+  attachShareImage(intent, image);
   if (text) {
       intent.putExtra(android.content.Intent.EXTRA_TEXT, text);
   }
-  intent.putExtra(android.content.Intent.EXTRA_STREAM, shareableFileUri);
 
   share(intent, subject, callback);
 }
@@ -85,6 +63,44 @@ export function shareUrl(url, text, subject, callback = null) {
   share(intent, subject, callback);
 }
 
+export function shareUrlImageText(url, image, text, subject, callback = null) {
+    const intent = getIntent("text/plain");
+
+    intent.putExtra(android.content.Intent.EXTRA_TEXT, url);
+    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, text);
+    attachShareImage(intent, image);
+
+    share(intent, subject, callback);
+}
+
 export function setShareView(nativeView: any) {
     // do nothing
+}
+
+function attachShareImage(intent, image) {
+    numberOfImagesCreated ++;
+
+    context = application.android.context;
+
+
+    const stream = new java.io.ByteArrayOutputStream();
+    image.android.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, stream);
+
+    const imageFileName = "socialsharing" + numberOfImagesCreated + ".jpg";
+    const newFile = new java.io.File(context.getExternalFilesDir(null), imageFileName);
+
+    const fos = new java.io.FileOutputStream(newFile);
+    fos.write(stream.toByteArray());
+
+    fos.flush();
+    fos.close();
+
+    let shareableFileUri;
+    const sdkVersionInt = parseInt(platform.device.sdkVersion);
+    if (sdkVersionInt >= 21) {
+        shareableFileUri = FileProviderPackageName.FileProvider.getUriForFile(context, application.android.nativeApp.getPackageName() + ".provider", newFile);
+    } else {
+        shareableFileUri = android.net.Uri.fromFile(newFile);
+    }
+    intent.putExtra(android.content.Intent.EXTRA_STREAM, shareableFileUri);
 }

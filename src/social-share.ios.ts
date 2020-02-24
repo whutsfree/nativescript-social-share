@@ -18,7 +18,7 @@ const SHARE_VIEW = {
 };
 
 function share(thingsToShare, callback = null) {
-  const activityController = UIActivityViewController.extend({
+  const activityController = (UIActivityViewController as any).extend({
       didDisappear: false,
       viewDidAppear: function(animated: boolean): void {
           this.didDisappear = false;
@@ -68,14 +68,38 @@ export function shareImage(image, subject, text, callback = null) {
   share([image, text], callback);
 }
 
-export function shareText(text, callback = null) {
+export function shareText(text, subject, callback = null) {
   share([text], callback);
 }
 
-export function shareUrl(url, text, callback = null) {
+export function shareUrl(url, text, subject, callback = null) {
   share([NSURL.URLWithString(url), text], callback);
+}
+
+export function shareUrlImageText(url, image, text, subject, callback = null) {
+    share([createUIActivityItemProviderImageOrURL(NSURL.URLWithString(url), image), text], callback);
 }
 
 export function setShareView(nativeView: any) {
     SHARE_VIEW.view = nativeView;
+}
+
+function createUIActivityItemProviderImageOrURL(url: any, image: any) {
+    return (UIActivityItemProvider as any).extend({
+        activityViewControllerItemForActivityType: function(activityViewController: UIActivityViewController, activityType: string): any {
+            // com.burbn.instagram.shareextension
+            // com.apple.UIKit.activity.Message
+            // com.apple.UIKit.activity.Mail
+            // com.apple.UIKit.activity.PostToFacebook
+            // com.facebook.Messenger.ShareExtension
+            if (activityType === "com.apple.UIKit.activity.PostToFacebook" ||
+                activityType === "com.facebook.Messenger.ShareExtension"
+            ) {
+                // facebook doesn't seem to allow text with a link in addition to an image, so use the url instead
+                return url;
+            } else {
+                return image;
+            }
+        }
+    }).alloc().initWithPlaceholderItem(image);
 }
